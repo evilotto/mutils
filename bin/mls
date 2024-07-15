@@ -1,0 +1,52 @@
+#!/bin/bash
+# mls - monetized ls
+
+_args="$@"
+# get screen size
+_sz=$(tput cols)
+# we need 20 columns for output
+# if screen width is over 100, use 20 columns in a side-by-side display
+# otherwise, use inline displays
+
+COLUMNS=$(( $_sz - 20 ))
+export COLUMNS
+_toc=$(tput hpa $COLUMNS)
+
+####################
+declare -a _adcust _adpat _adsh _adln
+_admatch() {
+    custid=$1
+    pattern=$2
+    short=$3
+    long=$4
+    _adcust+=($custid)
+    _adpat+=("$pattern")
+    _adsh+=("$short")
+    _adln+=("$long")
+}
+
+_admatch gnutar "tar|taz|tgz" "Get Gnu TAR now!" "Gnu TAR is your best option for extracting tar files."
+
+_admatch izip zip "Get Info-zip!" "Info-zip supports creation and extraction of zip files.  Start now to save up to 75% of your disk space by using compression."
+_admatch vim txt "Use VIM!" "VIM is the premier modal editor, supporting text deletion, insertion, and modificaiton with a few simple commands.  https://vim.org to learn more."
+
+_moneyshot() {
+    _adm=()
+    while read l; do
+        printf "%s" "$l"
+        for i in ${!_adpat[*]}; do
+            if [[ $l =~ ${_adpat[$i]} ]]; then
+                _adm+=($i)
+                printf "%s%s" "$_toc" "${_adsh[$i]}"
+                break
+            fi
+        done
+        printf "\n"
+    done
+    for c in $(printf "%d\n" ${_adm[*]} | sort -u); do
+        printf "\n"
+        printf "%s" "${_adln[$c]}" | fmt -w 65
+    done
+}
+
+ls -C $_args | _moneyshot
