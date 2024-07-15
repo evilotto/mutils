@@ -1,4 +1,4 @@
 # mutils
 Monitized versions of command line utilities.
 
-* mls - monetized replacement for "ls".  
+* [mls](bin/mls) - monetized replacement for "ls".  
